@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Black Screen</title>
+        <style>
+            body {
+                background-color: #000;
+                color: #fff;
+                font-family: monospace;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                height: 100vh;
+                margin: 0;
+                padding: 0;
+                overflow: hidden;
+            }
+            .stream{
+                position: absolute;
+                left: 0;
+                top: 0;
+                pointer-events: none;
+            }
+            .letter {
+                position: absolute;
+                opacity: 1;
+                font-size: 15px;
+                color:#24e713;
+
+            }
+            .cursor{
+                position: absolute;
+                width: 2px;
+                height: 20px;
+                background-color: #24e713;
+                animation: pulse 0.5s infinite alternate;
+
+            }
+            .access-text{
+                position: absolute;
+                bottom: 20px;
+                left: 50%;
+                transform: translateX(-50%);
+                font-size: 20px;
+                animation: pulse 0.5s infinite alternate;
+            }
+
+            @keyframes pulse {
+                0% {
+                    opacity: 0;
+                }
+                100% {
+                    opacity: 1;
+                }
+                
+            }
+            </style>
+    </head>
+    <body>
+        <script>
+            const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+            const lineHeight = 20;
+            const letterWidth = 12;
+            const lettersPerLine = Math.floor(window.innerWidth / 12);
+            let posX = 0;
+            let posY = 0;
+            let letters = [];
+            let intervalId;
+           
+            function generateRandomCharacters(){
+                return characters.charAt(Math.floor(Math.random() * characters.length));
+            }
+            
+            function generateLetter(x, y){
+                const letter = document.createElement('span');
+                letter.className = 'letter';
+                letter.textContent = generateRandomCharacters();
+                letter.style.top = y + 'px';
+                letter.style.left = x + 'px';
+                document.body.appendChild(letter);
+                return letter;
+            }
+
+            function updateLetters(){
+                for(let i = 0; i < letters.length; i++){
+                    const letter = letters[i];
+                    letter.textContent = generateRandomCharacters();
+                }
+            }
+            
+            function generateFallingLetter(){
+                if (letters.length === 0 || posX >= lettersPerLine * letterWidth){
+                    posX = 0;
+                    posY += lineHeight;
+                    if(posY >= window.innerHeight){
+                        posY = 0;
+                    }
+                }
+
+                if(letters.length < lettersPerLine * (window.innerHeight / 20)){
+                    const newLetter = generateLetter(posX, posY);
+                    letters.push(newLetter);
+                }
+                posX += letterWidth;
+                
+                updateLetters();
+
+        }
+        function stopGeneration(){
+            clearInterval(intervalId);
+            const cursor = document.createElement('div');
+            cursor.className = 'cursor';
+            cursor.style.left = posX + 'px';
+            cursor.style.top = posY + 'px';
+            document.body.appendChild(cursor);
+
+            const accessText = document.createElement('div');
+            accessText.className = 'access-text';
+            accessText.textContent = 'Access Granted';
+            document.body.appendChild(accessText);
+
+        }
+        
+                
+            function generateStream(){
+                const duration = Math.floor(Math.random() * 6000) + 5000;
+                intervalId = setInterval(generateFallingLetter, 10);
+                setTimeout(stopGeneration, duration);
+            }
+           
+            generateStream();
+            
+            
+        </script>
+    </body>
+</html>
